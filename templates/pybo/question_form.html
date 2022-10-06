@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <h5 class="my-3 border-bottom pb-2">질문등록</h5>
+        <form method="post">
+            <!--
+            form의 action은 form의 data를 보낼 Server의 url을 명시하는 데에 쓰이는 Tag다.
+            form에 action을 지정하지 않은 이유, action="{% url 'pybo:question_create' %}"
+            를 넣으면, 이 코드를 재활용 불가함. 질문 수정 등에서. action을 지정하지 않으면, 현 페이지의 url이
+            default로 설정된다. -->
+            {% csrf_token %}
+            <!--{{ form.as_p }}수동 구현 -->
+            <!-- views.py에서 render(request, 'pybo/question.html', {'form': form}
+            으로 보내온 form을 렌더링하는 옵션이다. as_p는 paragraph, as_table은 table 등-->
+            <!-- 오류 표시 -->
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for field in form %}
+                {% if field.errors %}
+                <div>
+                    <storng>{{ field.label }}</storng>
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- 오류 표시 끝 -->
+            <div class="mb-3">
+                <label for="subject" class="form-label">제목</label>
+                <input type="text" class="form-control" name="subject" id="subject"
+                       value="{{ form.subject.value|default_if_none:'' }}">
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea class="form-control" name="content" id="content" rows="10">{{ form.content.value|default_if_none:'' }}</textarea>
+                <!-- form.content.value는 오류시 기존 입력값 유지를 위함,
+                default_if_none:''는 입력값 없을 때 None이 나오는 대신 ''를 출력하기 위함
+                이를 Template Filter라고 한다. 앞에 |를 붙여 사용한다.-->
+            </div>
+            <button type="submit" class="btn btn-primary">저장하기</button>
+        </form>
+    </div>
+{% endblock %}
